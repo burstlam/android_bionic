@@ -394,8 +394,6 @@ extern "C" void chk_free(void *ptr) {
             log_message("+++ ALLOCATION %p IS CORRUPTED OR NOT ALLOCATED VIA TRACKER!\n",
                        user(hdr));
             print_backtrace(bt, depth);
-            /* Leak here so that we do not crash */
-            //dlfree(user(hdr));
         }
     } else {
         hdr->freed_bt_depth = get_backtrace(hdr->freed_bt,
@@ -491,14 +489,12 @@ static void heaptracker_free_leaked_memory() {
                         user(del), del->size);
             print_backtrace(del->bt, del->bt_depth);
         }
-        dlfree(del);
     }
 
 //  log_message("+++ DELETING %d BACKLOGGED ALLOCATIONS\n", backlog_num);
     while (backlog_head) {
         del = backlog_tail;
         del_from_backlog(del);
-        dlfree(del);
     }
 }
 
