@@ -439,7 +439,7 @@ libc_arch_dynamic_src_files := \
 ifeq ($(ARCH_ARM_HAVE_ARMV7A),true)
   ifneq ($(IS_ARMV7A_QCOM),true)
   libc_common_src_files += \
-	  arch-arm/bionic/armv7/memchr.S \
+	  arch-arm/bionic/memchr.S \
 	  arch-arm/bionic/armv7/strchr.S \
 	  arch-arm/bionic/armv7/strcpy.c \
 	  arch-arm/bionic/armv7/strlen.S
@@ -455,6 +455,7 @@ endif
 # Don't use linaro string routines on QCOM chipsets
 ifeq ($(ARCH_ARM_HAVE_ARMV7A)-$(IS_ARMV7A_QCOM),true-true)
 libc_common_src_files += \
+	arch-arm/bionic/memchr.S \
 	string/memchr.c \
 	string/strchr.c \
 	arch-arm/bionic/strcpy.S \
