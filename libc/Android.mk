@@ -377,7 +377,6 @@ libc_common_src_files += \
 	arch-arm/bionic/tgkill.S \
 	arch-arm/bionic/memcmp.S \
 	arch-arm/bionic/memcmp16.S \
-	arch-arm/bionic/memcpy.S \
 	arch-arm/bionic/memset.S \
 	arch-arm/bionic/setjmp.S \
 	arch-arm/bionic/sigsetjmp.S \
@@ -385,6 +384,13 @@ libc_common_src_files += \
 	arch-arm/bionic/syscall.S \
 	string/strncmp.c \
 	unistd/socketcalls.c
+
+# We have a special memcpy for A15 currently
+ifeq ($(TARGET_ARCH_VARIANT_CPU),cortex-a15)
+libc_common_src_files += arch-arm/bionic/memcpy-a15.S
+else
+libc_common_src_files += arch-arm/bionic/memcpy.S
+endif
 
 # Check if we want a neonized version of memmove instead of the
 # current ARM version
