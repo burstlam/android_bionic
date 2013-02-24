@@ -456,7 +456,6 @@ endif
 ifeq ($(ARCH_ARM_HAVE_ARMV7A)-$(IS_ARMV7A_QCOM),true-true)
 libc_common_src_files += \
 	arch-arm/bionic/memchr.S \
-	string/memchr.c \
 	string/strchr.c \
 	arch-arm/bionic/strcpy.S \
 	arch-arm/bionic/strlen.c.arm
