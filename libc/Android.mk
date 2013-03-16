@@ -395,7 +395,7 @@ endif
 
 # Check if we want a neonized version of memmove instead of the
 # current ARM version
-ifeq ($(ARCH_ARM_HAVE_NEON),true)
+ifeq ($(ARCH_ARM_HAVE_ARMV7A)-$(ARCH_ARM_HAVE_NEON),true-true)
  libc_common_src_files += \
 	arch-arm/bionic/memmove.S
  else # Other ARM
