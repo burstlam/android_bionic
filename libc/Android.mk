@@ -950,7 +950,10 @@ include $(CLEAR_VARS)
 # Since this code is experimental it is disabled by default.
 # see libc/bionic/pthread_debug.c for details
 
-LOCAL_CFLAGS := $(libc_common_cflags) -DPTHREAD_DEBUG -DPTHREAD_DEBUG_ENABLED=0
+LOCAL_CFLAGS := $(libc_common_cflags)
+ifdef PTHREAD_DEBUG
+LOCAL_CFLAGS += -DPTHREAD_DEBUG -DPTHREAD_DEBUG_ENABLED=0
+endif
 LOCAL_C_INCLUDES := $(libc_common_c_includes)
 
 LOCAL_SRC_FILES := \
@@ -958,8 +961,11 @@ LOCAL_SRC_FILES := \
 	$(libc_static_common_src_files) \
 	bionic/dlmalloc.c \
 	bionic/malloc_debug_common.cpp \
-	bionic/pthread_debug.c \
 	bionic/libc_init_dynamic.c
+ifdef PTHREAD_DEBUG
+LOCAL_SRC_FILES += \
+	bionic/pthread_debug.c
+endif
 
 ifeq ($(TARGET_ARCH),arm)
 	LOCAL_NO_CRT := true
