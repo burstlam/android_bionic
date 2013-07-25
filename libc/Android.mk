@@ -97,7 +97,6 @@ libc_common_src_files := \
 	string/index.c \
 	string/strcasecmp.c \
 	string/strcat.c \
-	string/strchr.c \
 	string/strcspn.c \
 	string/strdup.c \
 	string/strlcat.c \
@@ -151,7 +150,6 @@ libc_common_src_files := \
 	bionic/ldexp.c \
 	bionic/lseek64.c \
 	bionic/md5.c \
-	bionic/memchr.c \
 	bionic/memmem.c \
 	bionic/memrchr.c \
 	bionic/memswap.c \
@@ -383,6 +381,31 @@ libc_static_common_src_files += \
     bionic/pthread.c.arm \
     bionic/pthread_create.cpp.arm \
     bionic/pthread_key.cpp.arm \
+
+ifeq ($(ARCH_ARM_HAVE_ARMV7A),true)
+libc_common_src_files += \
+	arch-arm/bionic/armv7/memchr.S \
+	arch-arm/bionic/armv7/memcpy.S \
+	arch-arm/bionic/armv7/memset.S \
+	arch-arm/bionic/armv7/bzero.S \
+	arch-arm/bionic/armv7/strchr.S \
+	arch-arm/bionic/armv7/strcpy.c \
+	arch-arm/bionic/armv7/strlen.S
+else
+libc_common_src_files += \
+	string/memchr.c \
+	arch-arm/bionic/memcpy.S \
+	arch-arm/bionic/memset.S \
+	string/strchr.c \
+	arch-arm/bionic/strcpy.S \
+	arch-arm/bionic/strlen.c.arm
+endif
+
+else # arm
+
+libc_common_src_files += \
+	string/memchr.c \
+	string/strchr.c
 
 endif # arm
 
