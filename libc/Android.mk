@@ -365,9 +365,7 @@ libc_upstream_netbsd_src_files := \
 # =========================================================
 ifeq ($(TARGET_ARCH),arm)
 libc_common_src_files += \
-	bionic/memmove.c.arm \
-	string/bcopy.c \
-	string/strncmp.c
+	string/strncmp.c \
 
 # These files need to be arm so that gdbserver
 # can set breakpoints in them without messing
