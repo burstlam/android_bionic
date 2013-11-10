@@ -584,8 +584,8 @@ res_nsend(res_state statp,
 			if (n == 0)
 				goto next_ns;
 			if (DBG) {
-				__libc_format_log(ANDROID_LOG_DEBUG, "libc",
-					"time=%d, %d\n",time(NULL), time(NULL)%2);
+				__libc_format_log(ANDROID_LOG_DEBUG, "libc", "time=%ld\n",
+                                                  time(NULL));
 			}
 			if (v_circuit)
 				goto same_ns;
@@ -763,15 +763,15 @@ send_vc(res_state statp,
 
 	/* Are we still talking to whom we want to talk to? */
 	if (statp->_vcsock >= 0 && (statp->_flags & RES_F_VC) != 0) {
-		union {
-			struct sockaddr_storage storage;
-			struct sockaddr generic;
-		} peer;
-		socklen_t size = sizeof peer.storage;
-
+		struct sockaddr_storage peer;
+		socklen_t size = sizeof peer;
+		int old_mark;
+		int mark_size = sizeof(old_mark);
 		if (getpeername(statp->_vcsock,
-				&peer.generic, &size) < 0 ||
-		    !sock_eq(&peer.generic, nsap)) {
+				(struct sockaddr *)(void *)&peer, &size) < 0 ||
+		    !sock_eq((struct sockaddr *)(void *)&peer, nsap) ||
+			getsockopt(statp->_vcsock, SOL_SOCKET, SO_MARK, &old_mark, &mark_size) < 0 ||
+			old_mark != statp->_mark) {
 			res_nclose(statp);
 			statp->_flags &= ~RES_F_VC;
 		}
@@ -799,6 +799,14 @@ send_vc(res_state statp,
 				*terrno = errno;
 				Perror(statp, stderr, "socket(vc)", errno);
 				return (-1);
+			}
+		}
+		if (statp->_mark != 0) {
+			if (setsockopt(statp->_vcsock, SOL_SOCKET,
+				        SO_MARK, &statp->_mark, sizeof(statp->_mark)) < 0) {
+				*terrno = errno;
+				Perror(statp, stderr, "setsockopt", errno);
+				return -1;
 			}
 		}
 		errno = 0;
@@ -967,7 +975,7 @@ done:
 	fcntl(sock, F_SETFL, origflags);
 	if (DBG) {
 		__libc_format_log(ANDROID_LOG_DEBUG, "libc",
-			"  %d connect_with_timeout returning %s\n", sock, res);
+			"  %d connect_with_timeout returning %d\n", sock, res);
 	}
 	return res;
 }
@@ -1031,7 +1039,7 @@ retry:
 	}
 	if (DBG) {
 		__libc_format_log(ANDROID_LOG_DEBUG, "libc",
-			"  %d retrying_select returning %d for %d\n",sock, n);
+			"  %d retrying_select returning %d\n",sock, n);
 	}
 
 	return n;
@@ -1079,6 +1087,14 @@ send_dg(res_state statp,
 				return (-1);
 			}
 		}
+
+		if (statp->_mark != 0) {
+			if (setsockopt(EXT(statp).nssocks[ns], SOL_SOCKET,
+					SO_MARK, &(statp->_mark), sizeof(statp->_mark)) < 0) {
+				res_nclose(statp);
+				return -1;
+			}
+		}
 #ifndef CANNOT_CONNECT_DGRAM
 		/*
 		 * On a 4.3BSD+ machine (client and server,
@@ -1106,6 +1122,7 @@ send_dg(res_state statp,
 #endif /* !CANNOT_CONNECT_DGRAM */
 		Dprint(statp->options & RES_DEBUG,
 		       (stdout, ";; new DG socket\n"))
+
 	}
 	s = EXT(statp).nssocks[ns];
 #ifndef CANNOT_CONNECT_DGRAM
