@@ -763,13 +763,17 @@ send_vc(res_state statp,
 
 	/* Are we still talking to whom we want to talk to? */
 	if (statp->_vcsock >= 0 && (statp->_flags & RES_F_VC) != 0) {
-		struct sockaddr_storage peer;
-		socklen_t size = sizeof peer;
+		union {
+			struct sockaddr_storage storage;
+			struct sockaddr generic;
+		} peer;
+		socklen_t size = sizeof peer.storage;
 		int old_mark;
-		int mark_size = sizeof(old_mark);
+		int mark_size = sizeof old_mark;
+
 		if (getpeername(statp->_vcsock,
-				(struct sockaddr *)(void *)&peer, &size) < 0 ||
-		    !sock_eq((struct sockaddr *)(void *)&peer, nsap) ||
+				&peer.generic, &size) < 0 ||
+		    !sock_eq(&peer.generic, nsap) ||
 			getsockopt(statp->_vcsock, SOL_SOCKET, SO_MARK, &old_mark, &mark_size) < 0 ||
 			old_mark != statp->_mark) {
 			res_nclose(statp);
