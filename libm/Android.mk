@@ -142,7 +142,6 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/s_lrintf.c \
     upstream-freebsd/lib/msun/src/s_lround.c \
     upstream-freebsd/lib/msun/src/s_lroundf.c \
-    upstream-freebsd/lib/msun/src/s_modf.c \
     upstream-freebsd/lib/msun/src/s_modff.c \
     upstream-freebsd/lib/msun/src/s_nan.c \
     upstream-freebsd/lib/msun/src/s_nearbyint.c \
@@ -229,8 +228,9 @@ ifeq ($(TARGET_CPU_VARIANT),krait)
 	arm/e_pow.S	\
 	arm/s_cos.S	\
 	arm/s_sin.S	\
-	arm/e_sqrtf.S	\
-	arm/e_sqrt.S
+	arm/e_sqrtf.S \
+	arm/e_sqrt.S \
+    arm/s_modf.S
   libm_arm_cflags += -DKRAIT_NEON_OPTIMIZATION -fno-if-conversion
 else
   ifeq ($(TARGET_USE_QCOM_BIONIC_OPTIMIZATION),true)
@@ -239,14 +239,16 @@ else
       arm/s_cos.S \
       arm/s_sin.S \
       arm/e_sqrtf.S \
-      arm/e_sqrt.S
+      arm/e_sqrt.S \
+      arm/s_modf.S
     libm_arm_cflags += -DKRAIT_NEON_OPTIMIZATION -fno-if-conversion
   else
     libm_common_src_files += \
       upstream-freebsd/lib/msun/src/s_cos.c \
       upstream-freebsd/lib/msun/src/s_sin.c \
       upstream-freebsd/lib/msun/src/e_sqrtf.c \
-      upstream-freebsd/lib/msun/src/e_sqrt.c
+      upstream-freebsd/lib/msun/src/e_sqrt.c \
+      upstream-freebsd/lib/msun/src/s_modf.c
     endif
 endif
 
