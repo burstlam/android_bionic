@@ -152,7 +152,6 @@
     XX(__muldi3)             \
     XX(__mulsf3)             \
     XX(__nedf2)              \
-    XX(__popcountsi2)        \
     XX(__subdf3)             \
     XX(__subsf3)             \
     XX(__truncdfsf2)         \
